@@ -1,0 +1,3 @@
+#!/bin/bash
+ln -sf /app/files/images /app/backend/web/images
+ln -sf /app/files/images /app/frontend/web/images
