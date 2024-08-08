@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'thumbnailUrl')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'thumbnailImage')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'thumbnailImage')->fileInput() ?>
 
     <?= $form->field($model, 'shortDescription')->textarea(['rows' => 6]) ?>
 

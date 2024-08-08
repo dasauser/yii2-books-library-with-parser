@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Book;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -35,7 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'pageCount',
             'publishedDate',
             'thumbnailUrl',
-            'thumbnailImage',
+            [
+                'attribute' => 'thumbnailImage',
+                'format' => 'html',
+                'value' => function (Book $model) {
+                    return Html::img('/images/' . $model->thumbnailImage);
+                }
+            ],
             'shortDescription:ntext',
             'longDescription:ntext',
             'status',

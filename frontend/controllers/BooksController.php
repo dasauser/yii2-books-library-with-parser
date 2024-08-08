@@ -2,11 +2,12 @@
 
 namespace frontend\controllers;
 
+use common\helpers\BookHelper;
 use common\models\Book;
 use frontend\models\BookSearch;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * BooksController implements the CRUD actions for Book model.
@@ -70,7 +71,8 @@ class BooksController extends Controller
         $model = new Book();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            $model->load($this->request->post());
+            if (BookHelper::loadPhoto($model)->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -93,9 +95,11 @@ class BooksController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+        if ($this->request->isPost) {
+            $model->load($this->request->post());
+            if (BookHelper::loadPhoto($model)->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }}
 
         return $this->render('update', [
             'model' => $model,
