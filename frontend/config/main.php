@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-frontend',
+    'name' => 'My Little Library',
     'defaultRoute' => 'books',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
