@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\helpers\BookHelper;
 use common\models\Book;
+use common\models\Category;
 use frontend\models\BookSearch;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -97,6 +98,7 @@ class BooksController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'categories' => $this->getCategoriesList(),
         ]);
     }
 
@@ -119,6 +121,7 @@ class BooksController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'categories' => $this->getCategoriesList(),
         ]);
     }
 
@@ -150,5 +153,16 @@ class BooksController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * @return Category[]
+     */
+    public function getCategoriesList(): array
+    {
+        return Category::find()
+            ->select('name')
+            ->indexBy('id')
+            ->column();
     }
 }

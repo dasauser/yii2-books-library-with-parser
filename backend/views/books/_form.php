@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 /** @var yii\web\View $this */
 /** @var common\models\Book $model */
 /** @var yii\widgets\ActiveForm $form */
+/** @var array $categories */
 ?>
 
 <div class="book-form">
@@ -15,6 +16,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'isbn')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'categories')->dropDownList($categories, ['multiple' => true]) ?>
 
     <?= $form->field($model, 'pageCount')->textInput() ?>
 
@@ -29,6 +32,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'longDescription')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'status')->textInput(['maxlength' => true]) ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
