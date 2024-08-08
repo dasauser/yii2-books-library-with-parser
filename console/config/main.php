@@ -31,6 +31,10 @@ return [
                 ],
             ],
         ],
+        'urlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'scriptUrl' => 'http://localhost:20080/'
+        ]
     ],
     'params' => $params,
 ];
