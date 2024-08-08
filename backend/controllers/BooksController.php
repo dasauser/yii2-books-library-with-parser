@@ -37,6 +37,11 @@ class BooksController extends Controller
                             'allow' => true,
                             'roles' => ['?', '@'],
                         ],
+                        [
+                            'actions' => ['create', 'update', 'delete'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                        ],
                     ]
                 ]
             ]
