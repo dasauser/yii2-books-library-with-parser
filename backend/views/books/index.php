@@ -17,6 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <p>
+        <?= Html::a('Create Book', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
@@ -39,7 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'updated_at',
             [
                 'class' => ActionColumn::className(),
-                'template' => '{view}',
                 'urlCreator' => function ($action, Book $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
