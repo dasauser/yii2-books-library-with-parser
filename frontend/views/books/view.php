@@ -1,6 +1,7 @@
 <?php
 
 use common\models\Book;
+use common\models\Category;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -22,6 +23,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'title',
             'isbn',
+            [
+                'attribute' => 'categories',
+                'format' => 'raw',
+                'value' => function (Book $model) {
+                    return implode(', ', array_map(function (Category $category) {
+                        return Html::a($category->name, ['/categories/view', 'id' => $category->id]);
+                    }, $model->categories));
+                }
+            ],
             'pageCount',
             'publishedDate',
             'thumbnailUrl',
