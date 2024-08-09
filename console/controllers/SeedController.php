@@ -31,7 +31,7 @@ class SeedController extends Controller
         try {
             $signupForm = new SignupForm([
                 'username' => 'admin',
-                'password' => 'admin_password',
+                'password' => 'admin',
                 'email' => 'admin@example.com',
             ]);
 
