@@ -127,17 +127,16 @@ class SiteController extends Controller
 
         try {
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-                if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                    $key = 'success';
-                    $msg = 'Thank you for contacting us. We will respond to you as soon as possible.';
-                } else {
-                    $key = 'error';
-                    $msg = 'There was an error sending your message.';
-                }
-
                 $feedback = new Feedback($model->getAttributes(except: ['verifyCode']));
 
                 if ($feedback->save()) {
+                    if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+                        $key = 'success';
+                        $msg = 'Thank you for contacting us. We will respond to you as soon as possible.';
+                    } else {
+                        $key = 'error';
+                        $msg = 'There was an error sending your message.';
+                    }
                     Yii::$app->session->setFlash($key, $msg);
 
                     $transaction->commit();
