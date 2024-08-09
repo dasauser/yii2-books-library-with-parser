@@ -32,6 +32,13 @@ services:
       - MYSQL_USER=yii2advanced
       - MYSQL_PASSWORD=secret
 
+  rabbitmq:
+    image: rabbitmq:3.13
+    ports:
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=yii2advanced
+      - RABBITMQ_DEFAULT_PASS=secret
   #pgsql:
   #  image: postgres:9.5
   #  environment:
