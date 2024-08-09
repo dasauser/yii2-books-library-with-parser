@@ -1,5 +1,6 @@
 <?php
 
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -17,7 +18,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'isbn')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'categories')->dropDownList($categories, ['multiple' => true]) ?>
+    <?= $form->field($model, 'categoriesList')->widget(Select2::class, [
+        'data' => $categories,
+        'options' => [
+            'placeholder' => 'Select categories',
+            'multiple' => true
+        ],
+    ]) ?>
 
     <?= $form->field($model, 'pageCount')->textInput() ?>
 

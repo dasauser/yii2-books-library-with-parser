@@ -6,8 +6,10 @@ use common\helpers\BookHelper;
 use common\models\Book;
 use common\models\Category;
 use frontend\models\BookSearch;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -85,12 +87,24 @@ class BooksController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Book();
+        $transaction = Yii::$app->db->beginTransaction();
+
+        $model = new Book(['scenario' => Book::SCENARIO_CREATE]);
 
         if ($this->request->isPost) {
-            $model->load($this->request->post());
-            if (BookHelper::loadPhoto($model)->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            try {
+                $model->load($this->request->post());
+                if (BookHelper::loadPhoto($model)->save()) {
+                    $categories = Category::findAll(['id' => $model->categoriesList]);
+                    foreach ($categories as $category) {
+                        $model->link('categories', $category);
+                    }
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            } catch (\Exception $exception) {
+                $transaction->rollBack();
+                throw $exception;
             }
         } else {
             $model->loadDefaultValues();
@@ -112,12 +126,28 @@ class BooksController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->setScenario(Book::SCENARIO_UPDATE);
 
         if ($this->request->isPost) {
-            $model->load($this->request->post());
-            if (BookHelper::loadPhoto($model)->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }}
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $model->load($this->request->post());
+                if (BookHelper::loadPhoto($model)->save()) {
+                    $model->unlinkAll('categories', true);
+                    $categories = Category::findAll(['id' => $model->categoriesList]);
+                    foreach ($categories as $category) {
+                        $model->link('categories', $category);
+                    }
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            } catch (\Exception $exception) {
+                $transaction->rollBack();
+                throw $exception;
+            }
+        } else {
+            $model->categoriesList = ArrayHelper::getColumn($model->categories, 'id');
+        }
 
         return $this->render('update', [
             'model' => $model,

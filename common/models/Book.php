@@ -6,6 +6,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "books".
@@ -28,12 +29,39 @@ use yii\db\Expression;
  */
 class Book extends ActiveRecord
 {
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
+    public array $categoriesList = [];
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'books';
+    }
+
+    public function scenarios()
+    {
+        $attrs = [
+            'title',
+            'isbn',
+            'pageCount',
+            'publishedDate',
+            'thumbnailUrl',
+            'thumbnailImage',
+            'shortDescription',
+            'longDescription',
+            'status',
+            'created_at',
+            'updated_at',
+            'categoriesList'
+        ];
+        return ArrayHelper::merge(parent::scenarios(), [
+            self::SCENARIO_CREATE => $attrs,
+            self::SCENARIO_UPDATE => $attrs,
+        ]);
     }
 
     /**
@@ -50,6 +78,8 @@ class Book extends ActiveRecord
             [['isbn'], 'string', 'max' => 20],
             [['title'], 'unique'],
             [['isbn'], 'unique'],
+            [['categoriesList'], 'each', 'rule' => ['integer']],
+            [['categoriesList'], 'each', 'rule' => ['exist', 'targetClass' => Category::class, 'targetAttribute' => ['categoriesList' => 'id']]],
         ];
     }
 
