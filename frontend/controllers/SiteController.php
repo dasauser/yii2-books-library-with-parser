@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\models\Feedback;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -121,14 +122,32 @@ class SiteController extends Controller
     public function actionContact()
     {
         $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
 
-            return $this->refresh();
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+                    $key = 'success';
+                    $msg = 'Thank you for contacting us. We will respond to you as soon as possible.';
+                } else {
+                    $key = 'error';
+                    $msg = 'There was an error sending your message.';
+                }
+
+                $feedback = new Feedback($model->getAttributes(except: ['verifyCode']));
+
+                if ($feedback->save()) {
+                    Yii::$app->session->setFlash($key, $msg);
+
+                    $transaction->commit();
+
+                    return $this->refresh();
+                }
+            }
+        } catch (\Exception $exception) {
+            $transaction->rollBack();
+            throw $exception;
         }
 
         return $this->render('contact', [
