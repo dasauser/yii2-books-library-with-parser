@@ -9,6 +9,7 @@ use common\models\Category;
 use Yii;
 use yii\base\BaseObject;
 use yii\queue\JobInterface;
+use yii\web\ServerErrorHttpException;
 
 class ParseBooksJob extends BaseObject implements JobInterface
 {
@@ -33,17 +34,19 @@ class ParseBooksJob extends BaseObject implements JobInterface
                 'title' => $book?->title,
                 'isbn' => $book?->isbn,
                 'pageCount' => $book?->pageCount,
-                'publishedDate' => $book?->publishedDate?->{'$date'},
+                'publishedDate' => date('Y-m-d H:i:s', strtotime($book?->publishedDate?->{'$date'})),
                 'thumbnailUrl' => $book?->thumbnailUrl,
                 'thumbnailImage' => $imageFilename,
-                'shortDescription' => isset($book?->shortDescription) ? htmlentities($book?->shortDescription) : null,
-                'longDescription' => isset($book?->longDescription) ? htmlentities($book?->longDescription) : null,
+                'shortDescription' => property_exists($book, 'shortDescription') ? htmlentities($book->shortDescription) : null,
+                'longDescription' => property_exists($book, 'longDescription') ? htmlentities($book?->longDescription) : null,
                 'status' => $book?->status,
             ], '');
 
-            echo $model->save()
-                ? "book $book->title saved successfully\n"
-                : "failed to save book $book->title\n";
+            if ($model->save()) {
+                echo "book $book->title saved successfully\n";
+            } else {
+                throw new ServerErrorHttpException("failed to save book $book->title\n");
+            }
 
             $categories = Category::findAll(['name' => $book?->categories]);
             foreach ($categories as $category) {
@@ -58,7 +61,7 @@ class ParseBooksJob extends BaseObject implements JobInterface
             $transaction->commit();
         } catch (\Exception $exception) {
             $transaction->rollBack();
-            throw $exception;
+            echo $exception->getMessage();
         }
     }
 
