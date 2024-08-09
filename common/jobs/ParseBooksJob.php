@@ -3,6 +3,7 @@
 namespace common\jobs;
 
 use common\helpers\NameHelper;
+use common\models\Book;
 use yii\base\BaseObject;
 use yii\queue\JobInterface;
 
@@ -13,32 +14,49 @@ class ParseBooksJob extends BaseObject implements JobInterface
     public function execute($queue)
     {
         foreach ($this->books as $book) {
-            $this->saveNewBook($book);
-            $this->loadImageFile($book);
+            $imageFileName = $this->getImageFilename($book);
+
+            $this->saveNewBook($book, $imageFileName);
+            $this->loadImageFile($book->thumbnailUrl, $imageFileName);
         }
     }
 
-    private function saveNewBook(\stdClass $book)
+    private function saveNewBook(\stdClass $book, string $imageFilename): void
     {
-        echo "saved new book {$book->title}\n";
+        $model = new Book(['scenario' => Book::SCENARIO_CREATE]);
+        $model->load([
+            'title' => $book?->title,
+            'isbn' => $book?->isbn,
+            'pageCount' => $book?->pageCount,
+            'publishedDate' => $book?->publishedDate?->{'$date'},
+            'thumbnailUrl' => $book?->thumbnailUrl,
+            'thumbnailImage' => $imageFilename,
+            'shortDescription' => isset($book?->shortDescription) ? htmlentities($book?->shortDescription) : null,
+            'longDescription' => isset($book?->longDescription) ? htmlentities($book?->longDescription) : null,
+            'status' => $book?->status,
+        ], '');
+        echo $model->save()
+            ? "book $book->title saved successfully\n"
+            : "failed to save book $book->title\n";
     }
 
-    private function loadImageFile(\stdClass $book): void
+    private function loadImageFile(string $url, string $imageFilename): void
+    {
+        $fullFileName = \Yii::getAlias('@imagesDir') . '/' . $imageFilename;
+        echo (file_put_contents($fullFileName, file_get_contents($url)) === false
+            ?"failed to write file $imageFilename\n"
+            : "loaded image $fullFileName\n");
+    }
+
+    /**
+     * @param \stdClass $book
+     * @return string
+     */
+    private function getImageFilename(\stdClass $book): string
     {
         $imageUrl = parse_url($book->thumbnailUrl, PHP_URL_PATH);
         $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
-
-        $fileData = file_get_contents($book->thumbnailUrl);
-
-        $newFileName = NameHelper::removeSpaces(NameHelper::toLowerCase("{$book->title}_{$book->isbn}")).".$extension";
-
-        $fullFileName = \Yii::getAlias('@imagesDir') . '/' . $newFileName;
-
-        if (false === file_put_contents($fullFileName, $fileData)) {
-            echo "failed to write file $newFileName\n";
-            return;
-        }
-
-        echo "loaded image $fullFileName\n";
+        $newFileName = NameHelper::removeSpaces(NameHelper::toLowerCase("{$book->title}_{$book->isbn}")) . ".$extension";
+        return $newFileName;
     }
 }
