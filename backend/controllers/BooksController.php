@@ -95,9 +95,11 @@ class BooksController extends Controller
             try {
                 $model->load($this->request->post());
                 if (BookHelper::loadPhoto($model)->save()) {
-                    $categories = Category::findAll(['id' => $model->categoriesList]);
-                    foreach ($categories as $category) {
-                        $model->link('categories', $category);
+                    if (count($model->categoriesList) > 0) {
+                        $categories = Category::findAll(['id' => $model->categoriesList]);
+                        foreach ($categories as $category) {
+                            $model->link('categories', $category);
+                        }
                     }
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
@@ -134,9 +136,11 @@ class BooksController extends Controller
                 $model->load($this->request->post());
                 if (BookHelper::loadPhoto($model)->save()) {
                     $model->unlinkAll('categories', true);
-                    $categories = Category::findAll(['id' => $model->categoriesList]);
-                    foreach ($categories as $category) {
-                        $model->link('categories', $category);
+                    if (count($model->categoriesList) > 0) {
+                        $categories = Category::findAll(['id' => $model->categoriesList]);
+                        foreach ($categories as $category) {
+                            $model->link('categories', $category);
+                        }
                     }
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);

@@ -32,7 +32,7 @@ class Book extends ActiveRecord
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
 
-    public array $categoriesList = [];
+    public $categoriesList = [];
 
     /**
      * {@inheritdoc}
@@ -78,6 +78,12 @@ class Book extends ActiveRecord
             [['isbn'], 'string', 'max' => 20],
             [['title'], 'unique'],
             [['isbn'], 'unique'],
+            [['categoriesList'], 'filter', 'filter' => function ($value) {
+                if (is_string($value)) {
+                    return [];
+                }
+                return $value;
+            }],
             [['categoriesList'], 'each', 'rule' => ['integer']],
             [['categoriesList'], 'each', 'rule' => ['exist', 'targetClass' => Category::class, 'targetAttribute' => ['categoriesList' => 'id']]],
         ];
