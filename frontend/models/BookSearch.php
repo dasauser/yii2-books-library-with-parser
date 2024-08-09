@@ -5,12 +5,15 @@ namespace frontend\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Book;
+use yii\helpers\VarDumper;
 
 /**
  * BookSearch represents the model behind the search form of `common\models\Book`.
  */
 class BookSearch extends Book
 {
+    public ?int $categoryId = null;
+
     /**
      * {@inheritdoc}
      */
@@ -19,6 +22,7 @@ class BookSearch extends Book
         return [
             [['id', 'pageCount'], 'integer'],
             [['title', 'isbn', 'publishedDate', 'thumbnailUrl', 'thumbnailImage', 'shortDescription', 'longDescription', 'status', 'created_at', 'updated_at'], 'safe'],
+            ['categoryId', 'integer'],
         ];
     }
 
@@ -49,6 +53,11 @@ class BookSearch extends Book
         ]);
 
         $this->load($params);
+
+        if ($this->categoryId !== null) {
+            $query->innerJoin('book_category', 'book_id = id AND category_id = '.$this->categoryId);
+//        echo VarDumper::export($query->createCommand()->getRawSql());exit();
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails

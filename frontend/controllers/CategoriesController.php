@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Category;
 use backend\models\CategorySearch;
+use frontend\models\BookSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -36,8 +37,13 @@ class CategoriesController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new BookSearch(['categoryId' => $id]);
+        $dataProvider = $searchModel->search($this->request->queryParams);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
