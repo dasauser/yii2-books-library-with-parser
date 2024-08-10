@@ -101,17 +101,17 @@ class DataPreparer
 
     public function getImages(): array
     {
-        return $this->images;
+        return array_unique($this->images);
     }
 
     public function getCategories(): array
     {
-        return $this->categories;
+        return array_unique($this->categories);
     }
 
     public function getAuthors(): array
     {
-        return $this->authors;
+        return array_unique($this->authors);
     }
 
     public function getBooks(): array
