@@ -88,7 +88,7 @@ class CreateBooksJob extends BaseObject implements JobInterface
      */
     public function linkCategories(stdClass $book, Book $model): void
     {
-        $categories = Category::findAll(['name' => $book?->categories ?? ['New']]);
+        $categories = Category::findAll(['name' => $book?->categories]);
         foreach ($categories as $category) {
             $model->link('categories', $category);
         }

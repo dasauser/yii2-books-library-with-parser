@@ -66,7 +66,8 @@ class DataPreparer
         if (!$this->isPropertyValid($book, 'categories')) {
             return;
         }
-        foreach ($book->categories as $category) {
+        $categories = empty($book->categories) ? ['New'] : $book->categories;
+        foreach ($categories as $category) {
             if (!$this->storage->isCategoryExists($category)) {
                 $this->storage->addCategory($category);
                 $this->categories[$category] = $category;
