@@ -23,7 +23,7 @@ class ParsingController extends Controller
         $this->queue = Yii::$app->queue;
     }
 
-    public function actionIndex(string $filePath)
+    public function actionStart(string $filePath)
     {
         try {
             $parser = new Parser($filePath);
