@@ -68,7 +68,7 @@ class DataPreparer
         if (!static::isPropertyValid($book, 'categories')) {
             return;
         }
-        $categories = empty($book->categories) ? ['New'] : $book->categories;
+        $categories = static::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
         foreach ($categories as $category) {
             if (!$this->storage->isCategoryExists($category)) {
                 $this->storage->addCategory($category);
