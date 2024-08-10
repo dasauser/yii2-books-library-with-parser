@@ -20,21 +20,24 @@ class Parser
         $this->dataStorage = new DataStorage();
     }
 
-    public function parse(): Generator
+    public function parse(): ?Generator
     {
         /** @var stdClass $book */
         foreach ($this->books as $book) {
             $this->counter++;
 
-            $queue = new DataPreparer($this->dataStorage);
-            $queue->prepare($book);
+            $notPreparedData ??= new DataPreparer($this->dataStorage);
+            $notPreparedData->prepare($book);
 
             if ($this->counter === 10) {
                 $this->counter = 0;
-                yield $queue;
+                $preparedData = $notPreparedData;
+                $notPreparedData = null;
+                yield $preparedData;
             }
         }
-
-        yield $queue;
+        if ($this->counter < 10) {
+            yield $notPreparedData;
+        }
     }
 }

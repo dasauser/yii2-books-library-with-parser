@@ -28,6 +28,9 @@ class ParsingController extends Controller
         try {
             $parser = new Parser($filePath);
             foreach ($parser->parse() as $dataPreparer) {
+                if ($dataPreparer === null) {
+                    continue;
+                }
                 $this->createAuthorsJob($dataPreparer);
                 $this->createCategoriesJob($dataPreparer);
                 $this->createImagesJob($dataPreparer);
