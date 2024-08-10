@@ -2,6 +2,7 @@
 
 namespace common\jobs;
 
+use common\helpers\NameHelper;
 use common\models\Author;
 use yii\base\BaseObject;
 use yii\log\Logger;
@@ -23,7 +24,7 @@ class CreateAuthorsJob extends BaseObject implements JobInterface
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            foreach ($this->authors as $author) {
+            foreach ($this->getFilteredAuthors() as $author) {
                 $model = new Author(['name' => $author]);
                 if (!$model->save()) {
                     throw new ServerErrorHttpException('can not save author');
@@ -34,5 +35,18 @@ class CreateAuthorsJob extends BaseObject implements JobInterface
             $transaction->rollBack();
             $this->logger->log($e->getMessage(), Logger::LEVEL_ERROR);
         }
+    }
+
+    public function getFilteredAuthors(): array
+    {
+        $existingAuthors = Author::find()
+            ->select('name')
+            ->indexBy('name')
+            ->where(['name' => $this->authors])
+            ->column();
+
+        return array_filter($this->authors, function ($author) use ($existingAuthors) {
+            return !isset($author, $existingAuthors[$author]) && !empty(NameHelper::removeSpaces($author));
+        });
     }
 }

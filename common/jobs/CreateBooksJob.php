@@ -2,6 +2,7 @@
 
 namespace common\jobs;
 
+use common\helpers\NameHelper;
 use common\models\Author;
 use common\models\Book;
 use common\models\Category;
@@ -26,7 +27,11 @@ class CreateBooksJob extends BaseObject implements JobInterface
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            foreach ($this->books as $book) {
+            foreach ($this->getFilteredBooks() as $book) {
+                if (empty(NameHelper::removeSpaces($book?->title))) {
+                    continue;
+                }
+
                 $model = Book::find()
                     ->where(['title' => $book?->title, 'isbn' => $book?->isbn])
                     ->one();
@@ -100,5 +105,25 @@ class CreateBooksJob extends BaseObject implements JobInterface
         foreach ($authors as $author) {
             $model->link('authors', $author);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFilteredBooks()
+    {
+        $bookTitles = array_map(function ($book) {
+            return $book?->title;
+        }, $this->books);
+
+        $existingBooks = Book::find()
+            ->select(['title'])
+            ->indexBy('title')
+            ->where(['title' => $bookTitles])
+            ->column();
+
+        return array_filter($this->books, function ($book) use ($existingBooks) {
+            return !isset($existingBooks[$book->title]) && !empty(NameHelper::removeSpaces($book->title));
+        });
     }
 }

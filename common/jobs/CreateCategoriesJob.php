@@ -2,6 +2,7 @@
 
 namespace common\jobs;
 
+use common\helpers\NameHelper;
 use common\models\Category;
 use yii\base\BaseObject;
 use yii\log\Logger;
@@ -23,7 +24,7 @@ class CreateCategoriesJob extends BaseObject implements JobInterface
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            foreach ($this->categories as $category) {
+            foreach ($this->getFilteredCategories() as $category) {
                 $model = new Category(['name' => $category]);
                 if (!$model->save()) {
                     throw new ServerErrorHttpException('can not create category');
@@ -34,4 +35,18 @@ class CreateCategoriesJob extends BaseObject implements JobInterface
             $transaction->rollBack();
             $this->logger->log($e->getMessage(), Logger::LEVEL_ERROR);
         }
-    }}
+    }
+
+    public function getFilteredCategories()
+    {
+        $existingCategories = Category::find()
+            ->select('name')
+            ->indexBy('name')
+            ->where(['name' => $this->categories])
+            ->column();
+
+        return array_filter($this->categories, function ($category) use ($existingCategories) {
+            return !isset($category, $existingCategories[$category]) && !empty(NameHelper::removeSpaces($category));
+        });
+    }
+}
