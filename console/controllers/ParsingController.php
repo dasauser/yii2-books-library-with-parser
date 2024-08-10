@@ -27,6 +27,7 @@ class ParsingController extends Controller
     {
         try {
             $parser = new Parser($filePath);
+            $count = 0;
             foreach ($parser->parse() as $dataPreparer) {
                 if ($dataPreparer === null) {
                     continue;
@@ -35,6 +36,10 @@ class ParsingController extends Controller
                 $this->createCategoriesJob($dataPreparer);
                 $this->createImagesJob($dataPreparer);
                 $this->createBooksJob($dataPreparer);
+
+                $count += count($dataPreparer->getBooks());
+
+                echo "Parsed $count" . PHP_EOL;
             }
         } catch (Exception $e) {
             echo 'Error: ' . $e->getMessage();
