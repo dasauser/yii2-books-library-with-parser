@@ -38,18 +38,20 @@ class CreateBooksJob extends BaseObject implements JobInterface
                 ->where(['name' => $this->getAllAuthors($filteredBooks)])
                 ->all();
 
+            [$booksTitles, $bookIsbns] = $this->getAllBooksTitlesAndIsbns($filteredBooks);
+            $booksModels = Book::find()
+                ->indexBy('title')
+                ->where(['title' => $booksTitles, 'isbn' => $bookIsbns])
+                ->all();
+
             foreach ($filteredBooks as $book) {
-                if (empty(NameHelper::removeSpaces($book?->title))) {
+                $cleanTitle = NameHelper::removeSpaces($book?->title);
+
+                if (empty($cleanTitle)) {
                     continue;
                 }
 
-                $model = Book::find()
-                    ->where(['title' => $book?->title, 'isbn' => $book?->isbn])
-                    ->one();
-
-                if ($model === null) {
-                    $model = $this->createBook($book);
-                }
+                $model = $booksModels[$cleanTitle] ?? $this->createBook($book);
 
                 $this->linkCategories($book?->categories ?? [], $model, $categoriesModels);
                 $this->linkAuthors($book?->authors ?? [], $model, $authorsModels);
@@ -148,5 +150,19 @@ class CreateBooksJob extends BaseObject implements JobInterface
         }
 
         return $authors;
+    }
+
+    public function getAllBooksTitlesAndIsbns(array $filteredBooks): array
+    {
+        $titles = [];
+        $isbns = [];
+        foreach ($filteredBooks as $filteredBook) {
+            if (empty($filteredBook->title) || empty($filteredBook->isbn)) {
+                continue;
+            }
+            $titles[$filteredBook?->title] = $filteredBook?->title;
+            $isbns[$filteredBook?->isbn] = $filteredBook?->isbn;
+        }
+        return [$titles, $isbns];
     }
 }
