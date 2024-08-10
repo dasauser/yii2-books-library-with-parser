@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'pageCount',
-            'publishedDate',
+            'publishedDate:date',
             'thumbnailUrl',
             [
                 'attribute' => 'thumbnailImage',

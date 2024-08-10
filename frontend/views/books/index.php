@@ -28,9 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'title',
-            'isbn',
-            'pageCount',
-            'publishedDate',
+//            'isbn',
+//            'pageCount',
+            'publishedDate:date',
             [
                 'attribute' => 'categories',
                 'format' => 'raw',
