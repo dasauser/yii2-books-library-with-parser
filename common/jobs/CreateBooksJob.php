@@ -70,7 +70,7 @@ class CreateBooksJob extends BaseObject implements JobInterface
             'status' => $book?->status,
         ], '');
 
-        if (!$book->save()) {
+        if (!$model->save()) {
             throw new ServerErrorHttpException('can not save author');
         }
         return $model;
