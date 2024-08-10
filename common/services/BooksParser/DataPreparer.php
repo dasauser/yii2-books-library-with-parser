@@ -19,7 +19,7 @@ class DataPreparer
     {
     }
 
-    public function prepare(stdClass $book)
+    public function prepare(stdClass $book): void
     {
         $imageName = $this->createImageName($book);
         $this->setImageName($book, $imageName);
@@ -75,7 +75,7 @@ class DataPreparer
         }
     }
 
-    protected function prepareImage(?string $imageName, stdClass $book)
+    protected function prepareImage(?string $imageName, stdClass $book): void
     {
         if (!$this->isPropertyValid($book, 'thumbnailUrl')) {
             return;
@@ -89,7 +89,7 @@ class DataPreparer
         $this->images[$book->thumbnailUrl] = $imageName;
     }
 
-    protected function prepareBook(stdClass $book)
+    protected function prepareBook(stdClass $book): void
     {
         $this->booksQueue[] = $book;
     }
