@@ -1,6 +1,6 @@
 <?php
 
-namespace common\services\BookParser;
+namespace common\services\BooksParser;
 
 use common\helpers\NameHelper;
 use stdClass;
