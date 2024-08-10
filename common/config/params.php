@@ -9,4 +9,7 @@ return [
 
     'bsVersion' => '5.x',
     'bsDependencyEnabled' => false,
+
+    'backendHost' => 'http://localhost:21080/',
+    'frontendHost' => 'http://localhost:20080/',
 ];

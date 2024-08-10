@@ -38,7 +38,10 @@ AppAsset::register($this);
         ['label' => 'Books', 'url' => ['/books']],
         ['label' => 'Contact', 'url' => ['/site/contact']],
     ];
-    if (Yii::$app->user->isGuest) {
+    if (!Yii::$app->user->isGuest) {
+        $menuItems[] = [
+            'label' => 'Admin panel', 'url' => \yii\helpers\Url::to(Yii::$app->params['backendHost'], true)
+        ];
     }
 
     echo Nav::widget([
