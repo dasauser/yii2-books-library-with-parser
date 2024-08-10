@@ -41,7 +41,11 @@ AppAsset::register($this);
     ];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    }     
+    } else {
+        $menuItems[] = [
+            'label' => 'Library', 'url' => \yii\helpers\Url::to(Yii::$app->params['frontendHost'], true)
+        ];
+    }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],
         'items' => $menuItems,
