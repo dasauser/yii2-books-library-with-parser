@@ -2,32 +2,36 @@
 
 namespace console\controllers;
 
-use common\jobs\ParseBooksJob;
+use common\jobs\CreateAuthorsJob;
+use common\jobs\CreateBooksJob;
+use common\jobs\CreateCategoriesJob;
+use common\jobs\CreateImagesJob;
+use common\services\BookParser\DataPreparer;
+use common\services\BookParser\Parser;
 use Exception;
-use JsonMachine\Items;
+use Yii;
 use yii\console\Controller;
 use yii\queue\Queue;
 
 class ParsingController extends Controller
 {
+    private Queue $queue;
+
+    public function init()
+    {
+        parent::init();
+        $this->queue = Yii::$app->queue;
+    }
+
     public function actionIndex(string $filePath)
     {
         try {
-            $fruits = Items::fromFile($filePath);
-
-            $booksStack = [];
-
-            foreach ($fruits as $bookObject) {
-                $booksStack[] = $bookObject;
-
-                if (count($booksStack) === 10) {
-                    $this->createParseBooksJob($booksStack);
-                    $booksStack = [];
-                }
-            }
-
-            if (count($booksStack) < 10) {
-                $this->createParseBooksJob($booksStack);
+            $parser = new Parser($filePath);
+            foreach ($parser->parse() as $dataPreparer) {
+                $this->createAuthorsJob($dataPreparer);
+                $this->createCategoriesJob($dataPreparer);
+                $this->createImagesJob($dataPreparer);
+                $this->createBooksJob($dataPreparer);
             }
         } catch (Exception $e) {
             echo 'Error: ' . $e->getMessage();
@@ -35,19 +39,31 @@ class ParsingController extends Controller
 
     }
 
-    /**
-     * @param array $booksStack
-     * @return void
-     */
-    public function createParseBooksJob(array $booksStack): void
+    private function createAuthorsJob(DataPreparer $dataPreparer): void
     {
-        \Yii::$app->queue->on(Queue::EVENT_AFTER_ERROR, function ($event) {
-            echo 'Error!';
-        });
-
-        \Yii::$app->queue->push(new ParseBooksJob([
-            'books' => $booksStack,
+        $this->queue->push(new CreateAuthorsJob([
+            'authors' => $dataPreparer->getAuthors(),
         ]));
+    }
 
+    private function createCategoriesJob(DataPreparer $dataPreparer): void
+    {
+        $this->queue->push(new CreateCategoriesJob([
+            'categories' => $dataPreparer->getCategories(),
+        ]));
+    }
+
+    private function createBooksJob(DataPreparer $dataPreparer): void
+    {
+        $this->queue->push(new CreateBooksJob([
+            'books' => $dataPreparer->getBooks(),
+        ]));
+    }
+
+    private function createImagesJob(DataPreparer $dataPreparer): void
+    {
+        $this->queue->push(new CreateImagesJob([
+            'images' => $dataPreparer->getImages(),
+        ]));
     }
 }
