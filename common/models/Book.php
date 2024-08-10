@@ -70,14 +70,13 @@ class Book extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'isbn'], 'required'],
+            ['title', 'required'],
             [['pageCount'], 'integer'],
             [['publishedDate', 'created_at', 'updated_at'], 'safe'],
             [['shortDescription', 'longDescription'], 'string'],
             [['title', 'thumbnailUrl', 'thumbnailImage', 'status'], 'string', 'max' => 255],
             [['isbn'], 'string', 'max' => 20],
             [['title'], 'unique'],
-            [['isbn'], 'unique'],
             [['categoriesList'], 'filter', 'filter' => function ($value) {
                 if (is_string($value)) {
                     return [];

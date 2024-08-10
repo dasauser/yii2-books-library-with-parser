@@ -30,7 +30,7 @@ class DataPreparer
 
     protected function createImageName(stdClass $book): ?string
     {
-        if (!$this->isPropertyValid($book, 'thumbnailUrl')) {
+        if (!static::isPropertyValid($book, 'thumbnailUrl')) {
             return null;
         }
 
@@ -38,7 +38,9 @@ class DataPreparer
 
         $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
 
-        $lowered = NameHelper::toLowerCase("{$book->title}_{$book->isbn}");
+        $postfix = static::isPropertyValid($book, 'isbn') ? $book->isbn : time();
+
+        $lowered = NameHelper::toLowerCase("{$book->title}_".$postfix);
 
         return NameHelper::removeSpaces($lowered) . ".$extension";
     }
@@ -50,7 +52,7 @@ class DataPreparer
 
     protected function prepareAuthors(stdClass $book): void
     {
-        if (!$this->isPropertyValid($book, 'authors')) {
+        if (!static::isPropertyValid($book, 'authors')) {
             return;
         }
         foreach ($book->authors as $author) {
@@ -63,7 +65,7 @@ class DataPreparer
 
     protected function prepareCategories(stdClass $book): void
     {
-        if (!$this->isPropertyValid($book, 'categories')) {
+        if (!static::isPropertyValid($book, 'categories')) {
             return;
         }
         $categories = empty($book->categories) ? ['New'] : $book->categories;
@@ -77,7 +79,7 @@ class DataPreparer
 
     protected function prepareImage(?string $imageName, stdClass $book): void
     {
-        if (!$this->isPropertyValid($book, 'thumbnailUrl')) {
+        if (!static::isPropertyValid($book, 'thumbnailUrl')) {
             return;
         }
 
@@ -94,7 +96,7 @@ class DataPreparer
         $this->books[] = $book;
     }
 
-    protected function isPropertyValid(stdClass $book, string $property): bool
+    protected static function isPropertyValid(stdClass $book, string $property): bool
     {
         return property_exists($book, $property) && !empty($book?->{$property});
     }

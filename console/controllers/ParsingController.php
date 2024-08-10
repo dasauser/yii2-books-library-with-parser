@@ -42,7 +42,7 @@ class ParsingController extends Controller
                 echo "Parsed $count" . PHP_EOL;
             }
         } catch (Exception $e) {
-            echo 'Error: ' . $e->getMessage();
+            throw $e;
         }
 
     }

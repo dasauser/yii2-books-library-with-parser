@@ -171,11 +171,12 @@ class CreateBooksJob extends BaseObject implements JobInterface
         $titles = [];
         $isbns = [];
         foreach ($filteredBooks as $filteredBook) {
-            if (empty($filteredBook->title) || empty($filteredBook->isbn)) {
-                continue;
+            if (property_exists($filteredBook, 'title') && !empty($filteredBook->title)) {
+                $titles[$filteredBook->title] = $filteredBook->title;
             }
-            $titles[$filteredBook?->title] = $filteredBook?->title;
-            $isbns[$filteredBook?->isbn] = $filteredBook?->isbn;
+            if (property_exists($filteredBook, 'isbn') && !empty($filteredBook->isbn)) {
+                $isbns[$filteredBook->isbn] = $filteredBook->isbn;
+            }
         }
         return [$titles, $isbns];
     }
