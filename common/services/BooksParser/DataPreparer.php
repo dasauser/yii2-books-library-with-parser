@@ -90,7 +90,7 @@ class DataPreparer
 
     protected function prepareBook(stdClass $book): void
     {
-        $this->booksQueue[] = $book;
+        $this->books[] = $book;
     }
 
     protected function isPropertyValid(stdClass $book, string $property): bool
