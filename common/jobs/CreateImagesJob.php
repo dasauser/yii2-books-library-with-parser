@@ -33,6 +33,9 @@ class CreateImagesJob extends BaseObject implements JobInterface
     private function loadImageFile(string $url, string $imageFilename): void
     {
         $fullFileName = Yii::getAlias('@imagesDir') . '/' . $imageFilename;
+        if (file_exists($fullFileName)) {
+            return;
+        }
         if (file_put_contents($fullFileName, file_get_contents($url)) !== false) {
             return;
         }
