@@ -27,7 +27,18 @@ class CreateBooksJob extends BaseObject implements JobInterface
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
-            foreach ($this->getFilteredBooks() as $book) {
+            $filteredBooks = $this->getFilteredBooks();
+
+            $categoriesModels = Category::find()
+                ->indexBy('name')
+                ->where(['name' => $this->getAllCategories($filteredBooks)])
+                ->all();
+            $authorsModels = Author::find()
+                ->indexBy('name')
+                ->where(['name' => $this->getAllAuthors($filteredBooks)])
+                ->all();
+
+            foreach ($filteredBooks as $book) {
                 if (empty(NameHelper::removeSpaces($book?->title))) {
                     continue;
                 }
@@ -40,8 +51,8 @@ class CreateBooksJob extends BaseObject implements JobInterface
                     $model = $this->createBook($book);
                 }
 
-                $this->linkCategories($book, $model);
-                $this->linkAuthors($book, $model);
+                $this->linkCategories($book?->categories ?? [], $model, $categoriesModels);
+                $this->linkAuthors($book?->authors ?? [], $model, $authorsModels);
             }
             $transaction->commit();
         } catch (\Throwable $e) {
@@ -50,11 +61,6 @@ class CreateBooksJob extends BaseObject implements JobInterface
         }
     }
 
-    /**
-     * @param mixed $book
-     * @return Book
-     * @throws ServerErrorHttpException
-     */
     public function createBook(stdClass $book): Book
     {
         $model = new Book(['scenario' => Book::SCENARIO_CREATE]);
@@ -81,35 +87,26 @@ class CreateBooksJob extends BaseObject implements JobInterface
         return $model;
     }
 
-    /**
-     * @param mixed $book
-     * @param Book $model
-     * @return void
-     */
-    public function linkCategories(stdClass $book, Book $model): void
+    public function linkCategories(array $categories, Book $model, array $categoriesModels): void
     {
-        $categories = Category::findAll(['name' => $book?->categories]);
         foreach ($categories as $category) {
-            $model->link('categories', $category);
+            if (!isset($categoriesModels[$category])) {
+                continue;
+            }
+            $model->link('categories', $categoriesModels[$category]);
         }
     }
 
-    /**
-     * @param mixed $book
-     * @param Book $model
-     * @return void
-     */
-    public function linkAuthors(stdClass $book, Book $model): void
+    public function linkAuthors(array $authors, Book $model, array $authorsModels): void
     {
-        $authors = Author::findAll(['name' => $book?->authors]);
         foreach ($authors as $author) {
-            $model->link('authors', $author);
+            if (!isset($authorsModels[$author])) {
+                continue;
+            }
+            $model->link('authors', $authorsModels[$author]);
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getFilteredBooks()
     {
         $bookTitles = array_map(function ($book) {
@@ -125,5 +122,31 @@ class CreateBooksJob extends BaseObject implements JobInterface
         return array_filter($this->books, function ($book) use ($existingBooks) {
             return !isset($existingBooks[$book->title]) && !empty(NameHelper::removeSpaces($book->title));
         });
+    }
+
+    public function getAllCategories(array $filteredBooks): array
+    {
+        $categories = [];
+
+        foreach ($filteredBooks as $filteredBook) {
+            foreach ($filteredBook?->categories ?? [] as $category) {
+                $categories[$category] = $category;
+            }
+        }
+
+        return $categories;
+    }
+
+    public function getAllAuthors(array $filteredBooks): array
+    {
+        $authors = [];
+
+        foreach ($filteredBooks as $filteredBook) {
+            foreach ($filteredBook?->authors ?? [] as $author) {
+                $authors[$author] = $author;
+            }
+        }
+
+        return $authors;
     }
 }
