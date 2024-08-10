@@ -7,15 +7,14 @@ use stdClass;
 
 class DataPreparer
 {
-    protected array $images;
 
-    protected array $categories;
-
-    protected array $authors;
-    
-    protected array $books;
-    
-    public function __construct(protected DataStorage $storage)
+    public function __construct(
+        protected DataStorage $storage,
+        protected array       $images = [],
+        protected array       $categories = [],
+        protected array       $authors = [],
+        protected array       $books = [],
+    )
     {
     }
 
@@ -41,7 +40,7 @@ class DataPreparer
 
         $lowered = NameHelper::toLowerCase("{$book->title}_{$book->isbn}");
 
-        return NameHelper::removeSpaces($lowered).".$extension";
+        return NameHelper::removeSpaces($lowered) . ".$extension";
     }
 
     protected function setImageName(stdClass $book, ?string $imageName)
