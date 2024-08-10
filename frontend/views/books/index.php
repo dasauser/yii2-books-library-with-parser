@@ -41,7 +41,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             //'thumbnailUrl',
-            //'thumbnailImage',
+            [
+                'attribute' => 'thumbnailImage',
+                'format' => 'image',
+                'value' => function (Book $model) {
+                    return '/images/'.$model->thumbnailImage;
+                },
+            ],
             //'shortDescription:ntext',
             //'longDescription:ntext',
             //'status',
@@ -51,8 +57,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => ActionColumn::className(),
                 'template' => '{view}',
                 'urlCreator' => function ($action, Book $model, $key, $index, $column) {
-                    return Url::to(['books/'.$action, 'id' => $model->id]);
-                 }
+                    return Url::to(['books/' . $action, 'id' => $model->id]);
+                }
             ],
         ],
     ]); ?>

@@ -37,9 +37,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'thumbnailUrl',
             [
                 'attribute' => 'thumbnailImage',
-                'format' => 'html',
+                'format' => 'image',
                 'value' => function (Book $model) {
-                    return Html::img('/images/' . $model->thumbnailImage);
+                    return '/images/' . $model->thumbnailImage;
                 }
             ],
             'shortDescription:ntext',
