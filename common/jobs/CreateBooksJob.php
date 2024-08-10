@@ -29,20 +29,9 @@ class CreateBooksJob extends BaseObject implements JobInterface
         try {
             $filteredBooks = $this->getFilteredBooks();
 
-            $categoriesModels = Category::find()
-                ->indexBy('name')
-                ->where(['name' => $this->getAllCategories($filteredBooks)])
-                ->all();
-            $authorsModels = Author::find()
-                ->indexBy('name')
-                ->where(['name' => $this->getAllAuthors($filteredBooks)])
-                ->all();
-
-            [$booksTitles, $bookIsbns] = $this->getAllBooksTitlesAndIsbns($filteredBooks);
-            $booksModels = Book::find()
-                ->indexBy('title')
-                ->where(['title' => $booksTitles, 'isbn' => $bookIsbns])
-                ->all();
+            $categoriesModels = $this->getCategoriesModels($filteredBooks);
+            $authorsModels = $this->getAuthorsModels($filteredBooks);
+            $booksModels = $this->getBooksModels($filteredBooks);
 
             foreach ($filteredBooks as $book) {
                 $cleanTitle = NameHelper::removeSpaces($book?->title);
@@ -124,6 +113,31 @@ class CreateBooksJob extends BaseObject implements JobInterface
         return array_filter($this->books, function ($book) use ($existingBooks) {
             return !isset($existingBooks[$book->title]) && !empty(NameHelper::removeSpaces($book->title));
         });
+    }
+
+    public function getCategoriesModels(array $filteredBooks): array
+    {
+        return Category::find()
+            ->indexBy('name')
+            ->where(['name' => $this->getAllCategories($filteredBooks)])
+            ->all();
+    }
+
+    public function getAuthorsModels(array $filteredBooks): array
+    {
+        return Author::find()
+            ->indexBy('name')
+            ->where(['name' => $this->getAllAuthors($filteredBooks)])
+            ->all();
+    }
+
+    public function getBooksModels(array $filteredBooks): array
+    {
+        [$booksTitles, $bookIsbns] = $this->getAllBooksTitlesAndIsbns($filteredBooks);
+        return Book::find()
+            ->indexBy('title')
+            ->where(['title' => $booksTitles, 'isbn' => $bookIsbns])
+            ->all();
     }
 
     public function getAllCategories(array $filteredBooks): array
