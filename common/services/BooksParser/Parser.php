@@ -36,7 +36,7 @@ class Parser
                 yield $preparedData;
             }
         }
-        if ($this->counter < 10) {
+        if ($this->counter > 0 && $this->counter < 10) {
             yield $notPreparedData;
         }
     }
