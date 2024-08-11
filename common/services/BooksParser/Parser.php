@@ -11,7 +11,6 @@ class Parser
     protected Items $books;
 
     protected int $counter = 0;
-    protected int $parsedBooksCount = 0;
     protected DataStorage $dataStorage;
 
     public function __construct(protected string $fileToParsePath)
@@ -23,29 +22,28 @@ class Parser
 
     public function parse(): ?Generator
     {
-        $notPreparedData = null;
+        $dataCollection = null;
+
         /** @var stdClass $book */
         foreach ($this->books as $book) {
             $this->counter++;
-            $this->parsedBooksCount++;
 
-            $notPreparedData ??= new DataPreparer($this->dataStorage);
-            $notPreparedData->prepare($book);
+            $dataCollection ??= new DataCollection($this->dataStorage);
+            $dataCollection->add($book);
 
-            if ($this->counter === 10) {
-                $this->counter = 0;
-                $preparedData = $notPreparedData;
-                $notPreparedData = null;
-                yield $preparedData;
+            if ($this->counter % 10 === 0) {
+                yield $dataCollection;
+                $dataCollection = null;
             }
         }
-        if ($this->counter > 0 && $this->counter < 10) {
-            yield $notPreparedData;
+
+        if ($this->counter % 10 !== 0) {
+            yield $dataCollection;
         }
     }
 
-    public function getParsedBooksCount(): int
+    public function getCounter(): int
     {
-        return $this->parsedBooksCount;
+        return $this->counter;
     }
 }

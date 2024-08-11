@@ -6,7 +6,7 @@ use common\helpers\BookHelper;
 use common\helpers\NameHelper;
 use stdClass;
 
-class DataPreparer
+class DataCollection
 {
 
     public function __construct(
@@ -19,14 +19,14 @@ class DataPreparer
     {
     }
 
-    public function prepare(stdClass $book): void
+    public function add(stdClass $book): void
     {
         $imageName = $this->createImageName($book);
         $this->setImageName($book, $imageName);
-        $this->prepareAuthors($book);
-        $this->prepareCategories($book);
-        $this->prepareImage($imageName, $book);
-        $this->prepareBook($book);
+        $this->addAuthors($book);
+        $this->addCategories($book);
+        $this->addImage($imageName, $book);
+        $this->addBook($book);
     }
 
     protected function createImageName(stdClass $book): ?string
@@ -51,7 +51,7 @@ class DataPreparer
         $book->thumbnailImage = $imageName;
     }
 
-    protected function prepareAuthors(stdClass $book): void
+    protected function addAuthors(stdClass $book): void
     {
         $book->authors = BookHelper::getPropertyOrNull($book, 'authors') ?? [];
         foreach ($book->authors as $author) {
@@ -62,7 +62,7 @@ class DataPreparer
         }
     }
 
-    protected function prepareCategories(stdClass $book): void
+    protected function addCategories(stdClass $book): void
     {
         $book->categories = BookHelper::getPropertyOrNull($book, 'categories') ?? ['New'];
         foreach ($book->categories as $category) {
@@ -73,7 +73,7 @@ class DataPreparer
         }
     }
 
-    protected function prepareImage(?string $imageName, stdClass $book): void
+    protected function addImage(?string $imageName, stdClass $book): void
     {
         if (!BookHelper::isPropertyValid($book, 'thumbnailUrl')) {
             $book->thumbnailUrl = null;
@@ -88,7 +88,7 @@ class DataPreparer
         $this->images[$book->thumbnailUrl] = $imageName;
     }
 
-    protected function prepareBook(stdClass $book): void
+    protected function addBook(stdClass $book): void
     {
         $this->books[] = $book;
     }

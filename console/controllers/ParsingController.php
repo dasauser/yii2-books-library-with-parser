@@ -6,7 +6,7 @@ use common\jobs\CreateAuthorsJob;
 use common\jobs\CreateBooksJob;
 use common\jobs\CreateCategoriesJob;
 use common\jobs\CreateImagesJob;
-use common\services\BooksParser\DataPreparer;
+use common\services\BooksParser\DataCollection;
 use common\services\BooksParser\Parser;
 use Exception;
 use Yii;
@@ -36,7 +36,7 @@ class ParsingController extends Controller
                 $this->createImagesJob($dataPreparer);
                 $this->createBooksJob($dataPreparer);
 
-                echo "Parsed {$parser->getParsedBooksCount()}" . PHP_EOL;
+                echo "Parsed {$parser->getCounter()}" . PHP_EOL;
             }
         } catch (Exception $e) {
             throw $e;
@@ -44,7 +44,7 @@ class ParsingController extends Controller
 
     }
 
-    private function createAuthorsJob(DataPreparer $dataPreparer): void
+    private function createAuthorsJob(DataCollection $dataPreparer): void
     {
         $authors = $dataPreparer->getAuthors();
         if (!empty($authors)) {
@@ -54,7 +54,7 @@ class ParsingController extends Controller
         }
     }
 
-    private function createCategoriesJob(DataPreparer $dataPreparer): void
+    private function createCategoriesJob(DataCollection $dataPreparer): void
     {
         $categories = $dataPreparer->getCategories();
         if (!empty($categories)) {
@@ -64,7 +64,7 @@ class ParsingController extends Controller
         }
     }
 
-    private function createBooksJob(DataPreparer $dataPreparer): void
+    private function createBooksJob(DataCollection $dataPreparer): void
     {
         $books = $dataPreparer->getBooks();
         if (!empty($books)) {
@@ -74,7 +74,7 @@ class ParsingController extends Controller
         }
     }
 
-    private function createImagesJob(DataPreparer $dataPreparer): void
+    private function createImagesJob(DataCollection $dataPreparer): void
     {
         $images = $dataPreparer->getImages();
         if (!empty($images)) {
