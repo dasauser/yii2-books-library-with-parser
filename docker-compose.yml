@@ -5,7 +5,7 @@ services:
   frontend:
     build: frontend
     ports:
-      - 20080:80
+      - ${FRONTEND_APP_PORT:-20080}:80
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -15,7 +15,7 @@ services:
   backend:
     build: backend
     ports:
-      - 21080:80
+      - ${BACKEND_APP_PORT:-21080}:80
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -25,20 +25,20 @@ services:
   mysql:
     image: mysql:5.7
     ports:
-      - 3306:3306
+      - ${MYSQL_PORT:-3306}:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=verysecret
-      - MYSQL_DATABASE=yii2advanced
-      - MYSQL_USER=yii2advanced
-      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-verysecret}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-yii2advanced}
+      - MYSQL_USER=${MYSQL_USER:-yii2advanced}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
 
   rabbitmq:
     image: rabbitmq:3.13
     ports:
-      - 5672:5672
+      - ${RABBITMQ_PORT:-5672}:5672
     environment:
-      - RABBITMQ_DEFAULT_USER=yii2advanced
-      - RABBITMQ_DEFAULT_PASS=secret
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-yii2advanced}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-secret}
   #pgsql:
   #  image: postgres:9.5
   #  environment:
