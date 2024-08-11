@@ -22,7 +22,9 @@ class DataCollection
     public function add(stdClass $book): void
     {
         $imageName = $this->createImageName($book);
+
         $this->setImageName($book, $imageName);
+
         $this->addAuthors($book);
         $this->addCategories($book);
         $this->addImage($imageName, $book);
@@ -54,22 +56,28 @@ class DataCollection
     protected function addAuthors(stdClass $book): void
     {
         $book->authors = BookHelper::getPropertyOrNull($book, 'authors') ?? [];
+
         foreach ($book->authors as $author) {
-            if (!$this->storage->isAuthorExists($author)) {
-                $this->storage->addAuthor($author);
-                $this->authors[$author] = $author;
+            if ($this->storage->isAuthorExists($author)) {
+                continue;
             }
+
+            $this->storage->addAuthor($author);
+            $this->authors[$author] = $author;
         }
     }
 
     protected function addCategories(stdClass $book): void
     {
         $book->categories = BookHelper::getPropertyOrNull($book, 'categories') ?? ['New'];
+
         foreach ($book->categories as $category) {
-            if (!$this->storage->isCategoryExists($category)) {
-                $this->storage->addCategory($category);
-                $this->categories[$category] = $category;
+            if ($this->storage->isCategoryExists($category)) {
+                continue;
             }
+
+            $this->storage->addCategory($category);
+            $this->categories[$category] = $category;
         }
     }
 
