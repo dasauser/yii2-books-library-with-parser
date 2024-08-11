@@ -64,9 +64,8 @@ class DataPreparer
 
     protected function prepareCategories(stdClass $book): void
     {
-        $book->categories = BookHelper::getPropertyOrNull($book, 'categories') ?? [];
-        $categories = BookHelper::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
-        foreach ($categories as $category) {
+        $book->categories = BookHelper::getPropertyOrNull($book, 'categories') ?? ['New'];
+        foreach ($book->categories as $category) {
             if (!$this->storage->isCategoryExists($category)) {
                 $this->storage->addCategory($category);
                 $this->categories[$category] = $category;
