@@ -29,4 +29,8 @@ class BookHelper
         return $book;
     }
 
+    public static function isPropertyValid(object $book, string $property): bool
+    {
+        return property_exists($book, $property) && !empty($book?->{$property});
+    }
 }

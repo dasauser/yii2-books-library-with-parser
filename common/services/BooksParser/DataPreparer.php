@@ -2,6 +2,7 @@
 
 namespace common\services\BooksParser;
 
+use common\helpers\BookHelper;
 use common\helpers\NameHelper;
 use stdClass;
 
@@ -30,7 +31,7 @@ class DataPreparer
 
     protected function createImageName(stdClass $book): ?string
     {
-        if (!static::isPropertyValid($book, 'thumbnailUrl')) {
+        if (!BookHelper::isPropertyValid($book, 'thumbnailUrl')) {
             return null;
         }
 
@@ -38,7 +39,7 @@ class DataPreparer
 
         $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
 
-        $postfix = static::isPropertyValid($book, 'isbn') ? $book->isbn : time();
+        $postfix = BookHelper::isPropertyValid($book, 'isbn') ? $book->isbn : time();
 
         $lowered = NameHelper::toLowerCase("{$book->title}_".$postfix);
 
@@ -52,7 +53,7 @@ class DataPreparer
 
     protected function prepareAuthors(stdClass $book): void
     {
-        if (!static::isPropertyValid($book, 'authors')) {
+        if (!BookHelper::isPropertyValid($book, 'authors')) {
             $book->authors = [];
             return;
         }
@@ -66,11 +67,11 @@ class DataPreparer
 
     protected function prepareCategories(stdClass $book): void
     {
-        if (!static::isPropertyValid($book, 'categories')) {
+        if (!BookHelper::isPropertyValid($book, 'categories')) {
             $book->categories = [];
             return;
         }
-        $categories = static::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
+        $categories = BookHelper::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
         foreach ($categories as $category) {
             if (!$this->storage->isCategoryExists($category)) {
                 $this->storage->addCategory($category);
@@ -81,7 +82,7 @@ class DataPreparer
 
     protected function prepareImage(?string $imageName, stdClass $book): void
     {
-        if (!static::isPropertyValid($book, 'thumbnailUrl')) {
+        if (!BookHelper::isPropertyValid($book, 'thumbnailUrl')) {
             $book->thumbnailUrl = null;
             return;
         }
@@ -97,11 +98,6 @@ class DataPreparer
     protected function prepareBook(stdClass $book): void
     {
         $this->books[] = $book;
-    }
-
-    protected static function isPropertyValid(stdClass $book, string $property): bool
-    {
-        return property_exists($book, $property) && !empty($book?->{$property});
     }
 
     public function getImages(): array
