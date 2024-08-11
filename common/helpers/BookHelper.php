@@ -33,4 +33,9 @@ class BookHelper
     {
         return property_exists($book, $property) && !empty($book?->{$property});
     }
+
+    public static function getPropertyOrNull(object $book, string $property): mixed
+    {
+        return property_exists($book, $property) && !empty($book?->{$property}) ? $book?->{$property} : null;
+    }
 }

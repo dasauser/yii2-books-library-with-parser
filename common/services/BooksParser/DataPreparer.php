@@ -53,10 +53,7 @@ class DataPreparer
 
     protected function prepareAuthors(stdClass $book): void
     {
-        if (!BookHelper::isPropertyValid($book, 'authors')) {
-            $book->authors = [];
-            return;
-        }
+        $book->authors = BookHelper::getPropertyOrNull($book, 'authors') ?? [];
         foreach ($book->authors as $author) {
             if (!$this->storage->isAuthorExists($author)) {
                 $this->storage->addAuthor($author);
@@ -67,10 +64,7 @@ class DataPreparer
 
     protected function prepareCategories(stdClass $book): void
     {
-        if (!BookHelper::isPropertyValid($book, 'categories')) {
-            $book->categories = [];
-            return;
-        }
+        $book->categories = BookHelper::getPropertyOrNull($book, 'categories') ?? [];
         $categories = BookHelper::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
         foreach ($categories as $category) {
             if (!$this->storage->isCategoryExists($category)) {

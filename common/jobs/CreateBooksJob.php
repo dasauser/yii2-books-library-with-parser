@@ -2,6 +2,7 @@
 
 namespace common\jobs;
 
+use common\helpers\BookHelper;
 use common\helpers\NameHelper;
 use common\models\Author;
 use common\models\Book;
@@ -57,19 +58,18 @@ class CreateBooksJob extends BaseObject implements JobInterface
         $model = new Book(['scenario' => Book::SCENARIO_CREATE]);
 
         $model->load([
-            'title' => $book?->title,
-            'isbn' => $book?->isbn,
-            'pageCount' => $book?->pageCount,
-            'publishedDate' => date('Y-m-d H:i:s', strtotime($book?->publishedDate?->{'$date'})),
-            'thumbnailUrl' => $book?->thumbnailUrl,
-            'thumbnailImage' => $book?->thumbnailImage,
-            'shortDescription' => property_exists($book, 'shortDescription')
-                ? htmlentities($book->shortDescription) :
-                null,
-            'longDescription' => property_exists($book, 'longDescription')
-                ? htmlentities($book?->longDescription)
+            'title' => $book->title,
+            'isbn' => BookHelper::getPropertyOrNull($book, 'isbn'),
+            'pageCount' => BookHelper::getPropertyOrNull($book, 'pageCount'),
+            'thumbnailUrl' => BookHelper::getPropertyOrNull($book, 'thumbnailUrl'),
+            'thumbnailImage' => BookHelper::getPropertyOrNull($book, 'thumbnailImage'),
+            'shortDescription' => BookHelper::getPropertyOrNull($book, 'shortDescription'),
+            'longDescription' => BookHelper::getPropertyOrNull($book, 'longDescription'),
+            'status' => BookHelper::getPropertyOrNull($book, 'status'),
+
+            'publishedDate' => BookHelper::isPropertyValid($book, 'publishedDate')
+                ? date('Y-m-d H:i:s', strtotime($book->publishedDate?->{'$date'}))
                 : null,
-            'status' => $book?->status,
         ], '');
 
         if (!$model->save()) {
