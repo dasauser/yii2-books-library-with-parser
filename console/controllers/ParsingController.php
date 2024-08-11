@@ -49,29 +49,41 @@ class ParsingController extends Controller
 
     private function createAuthorsJob(DataPreparer $dataPreparer): void
     {
-        $this->queue->push(new CreateAuthorsJob([
-            'authors' => $dataPreparer->getAuthors(),
-        ]));
+        $authors = $dataPreparer->getAuthors();
+        if (!empty($authors)) {
+            $this->queue->push(new CreateAuthorsJob([
+                'authors' => $authors,
+            ]));
+        }
     }
 
     private function createCategoriesJob(DataPreparer $dataPreparer): void
     {
-        $this->queue->push(new CreateCategoriesJob([
-            'categories' => $dataPreparer->getCategories(),
-        ]));
+        $categories = $dataPreparer->getCategories();
+        if (!empty($categories)) {
+            $this->queue->push(new CreateCategoriesJob([
+                'categories' => $categories,
+            ]));
+        }
     }
 
     private function createBooksJob(DataPreparer $dataPreparer): void
     {
-        $this->queue->push(new CreateBooksJob([
-            'books' => $dataPreparer->getBooks(),
-        ]));
+        $books = $dataPreparer->getBooks();
+        if (!empty($books)) {
+            $this->queue->push(new CreateBooksJob([
+                'books' => $books,
+            ]));
+        }
     }
 
     private function createImagesJob(DataPreparer $dataPreparer): void
     {
-        $this->queue->push(new CreateImagesJob([
-            'images' => $dataPreparer->getImages(),
-        ]));
+        $images = $dataPreparer->getImages();
+        if (!empty($images)) {
+            $this->queue->push(new CreateImagesJob([
+                'images' => $images,
+            ]));
+        }
     }
 }
