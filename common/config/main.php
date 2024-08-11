@@ -12,13 +12,5 @@ return [
         'cache' => [
             'class' => \yii\caching\FileCache::class,
         ],
-        'queue' => [
-            'class' => \yii\queue\amqp_interop\Queue::class,
-            'host' => 'localhost',
-            'port' => 5672,
-            'user' => 'yii2advanced',
-            'password' => 'secret',
-            'queueName' => 'queue',
-        ],
     ],
 ];
