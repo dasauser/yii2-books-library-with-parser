@@ -23,6 +23,7 @@ class Parser
 
     public function parse(): ?Generator
     {
+        $notPreparedData = null;
         /** @var stdClass $book */
         foreach ($this->books as $book) {
             $this->counter++;
