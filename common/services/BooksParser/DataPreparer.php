@@ -53,6 +53,7 @@ class DataPreparer
     protected function prepareAuthors(stdClass $book): void
     {
         if (!static::isPropertyValid($book, 'authors')) {
+            $book->authors = [];
             return;
         }
         foreach ($book->authors as $author) {
@@ -66,6 +67,7 @@ class DataPreparer
     protected function prepareCategories(stdClass $book): void
     {
         if (!static::isPropertyValid($book, 'categories')) {
+            $book->categories = [];
             return;
         }
         $categories = static::isPropertyValid($book, 'categories') ? $book->categories : ['New'];
@@ -80,6 +82,7 @@ class DataPreparer
     protected function prepareImage(?string $imageName, stdClass $book): void
     {
         if (!static::isPropertyValid($book, 'thumbnailUrl')) {
+            $book->thumbnailUrl = null;
             return;
         }
 
