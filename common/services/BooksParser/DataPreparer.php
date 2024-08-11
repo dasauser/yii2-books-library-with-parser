@@ -39,7 +39,7 @@ class DataPreparer
 
         $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
 
-        $postfix = BookHelper::isPropertyValid($book, 'isbn') ? $book->isbn : time();
+        $postfix = BookHelper::getPropertyOrNull($book, 'isbn') ?? time();
 
         $lowered = NameHelper::toLowerCase("{$book->title}_".$postfix);
 
